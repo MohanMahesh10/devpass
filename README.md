@@ -14,10 +14,10 @@ DevPass is a lean event registration system built for developer communities. Att
 **Registration confirmed**
 ![Registration confirmed](https://github.com/user-attachments/assets/00201884-ddba-43b2-ae45-7281e95a299e)
 
-**Admin dashboard — attendee list**
+**Email Confirmation**
 ![Admin dashboard](https://github.com/user-attachments/assets/c4c21625-da0b-41f7-8392-a8cbb0fca924)
 
-**Admin dashboard — approve / reject**
+**Admin dashboard — approve / reject(agent curated)**
 ![Admin approve reject](https://github.com/user-attachments/assets/e23d1250-1fb2-4198-b798-7a81efee2357)
 
 **Admin stats overview**
