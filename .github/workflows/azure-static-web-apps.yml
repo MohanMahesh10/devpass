@@ -1,11 +1,18 @@
 name: Azure Static Web Apps CI/CD
 
+# Manual-only trigger until the SWA resource + secrets are provisioned.
+# After you create the Static Web App and add AZURE_STATIC_WEB_APPS_API_TOKEN
+# + REACT_APP_API_BASE as repo secrets, re-enable push/pull_request triggers
+# by uncommenting the block below.
+#
+# on:
+#   push:
+#     branches: [main]
+#   pull_request:
+#     types: [opened, synchronize, reopened, closed]
+#     branches: [main]
+#   workflow_dispatch: {}
 on:
-  push:
-    branches: [main]
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches: [main]
   workflow_dispatch: {}
 
 jobs:
