@@ -1,51 +1,63 @@
 # DevPass
 
-> **Register. Get Approved. Show Your Pass.**
+**Register. Get Approved. Show Your Pass.**
 
-A lean, production-ready MVP for running developer events on Azure's lowest-cost services.
+DevPass is a lean event registration system built for developer communities. Attendees apply online, an admin curates the list, and approved attendees receive a QR pass by email. Volunteers scan QR codes at the door — no app required.
 
-- Attendees self-register at `/register`
-- Admin reviews and approves / rejects at `/admin`
-- Approved attendees receive an email with a QR DevPass
-- Volunteers scan QR codes at the door at `/scan`
+---
 
+## Screenshots
 
-<img width="1171" height="812" alt="Screenshot 2026-04-20 162936" src="https://github.com/user-attachments/assets/f7deb269-1b92-4ec1-be8d-8a263d634d21" />
+**Registration form**
+![Registration form](https://github.com/user-attachments/assets/f7deb269-1b92-4ec1-be8d-8a263d634d21)
 
-<img width="1141" height="766" alt="Screenshot 2026-04-20 163000" src="https://github.com/user-attachments/assets/00201884-ddba-43b2-ae45-7281e95a299e" />
+**Registration confirmed**
+![Registration confirmed](https://github.com/user-attachments/assets/00201884-ddba-43b2-ae45-7281e95a299e)
 
-<img width="1482" height="691" alt="Screenshot 2026-04-20 163032" src="https://github.com/user-attachments/assets/c4c21625-da0b-41f7-8392-a8cbb0fca924" />
+**Admin dashboard — attendee list**
+![Admin dashboard](https://github.com/user-attachments/assets/c4c21625-da0b-41f7-8392-a8cbb0fca924)
 
-<img width="1150" height="757" alt="Screenshot 2026-04-20 163110" src="https://github.com/user-attachments/assets/e23d1250-1fb2-4198-b798-7a81efee2357" />
+**Admin dashboard — approve / reject**
+![Admin approve reject](https://github.com/user-attachments/assets/e23d1250-1fb2-4198-b798-7a81efee2357)
 
-<img width="1582" height="735" alt="Screenshot 2026-04-20 163146" src="https://github.com/user-attachments/assets/1cd5c547-ba29-46a6-bd8d-fc363c8c6e09" />
+**Admin stats overview**
+![Admin stats](https://github.com/user-attachments/assets/1cd5c547-ba29-46a6-bd8d-fc363c8c6e09)
 
-<img width="590" height="1280" alt="WhatsApp Image 2026-04-20 at 16 33 20" src="https://github.com/user-attachments/assets/3dd83f1c-b29c-4e52-99c1-1094a82c993d" />
+**QR pass email — mobile**
 
-<img width="590" height="1280" alt="WhatsApp Image 2026-04-20 at 16 33 24" src="https://github.com/user-attachments/assets/0096505d-91a0-4a61-9893-8fdb0fba4ccd" />
+![QR pass email](https://github.com/user-attachments/assets/3dd83f1c-b29c-4e52-99c1-1094a82c993d)
 
+**QR scan at the door — mobile**
 
+![QR scan](https://github.com/user-attachments/assets/0096505d-91a0-4a61-9893-8fdb0fba4ccd)
 
+---
 
+## What it does
 
-
-
+| Who | Where | What happens |
+|---|---|---|
+| Attendee | `/register` | Fills out a form — name, email, role, LinkedIn, GitHub, why they want to attend |
+| Attendee | `/confirmed` | Sees a confirmation screen; waits for email |
+| Admin | `/admin` | Reviews applicants, clicks Approve or Reject — email fires instantly |
+| Attendee | Inbox | Gets a QR pass (approved) or a polite "we're at capacity" note (rejected) |
+| Volunteer | `/scan` | Opens camera on phone, scans QR at the door — green means in, red means no |
 
 ---
 
 ## Stack
 
-| Layer            | Choice                                                           |
-| ---------------- | ---------------------------------------------------------------- |
-| Storage          | **Azure Table Storage** (Standard LRS)                           |
-| Email            | **Azure Communication Services — Email**                         |
-| Backend          | Node.js + Express — hosted on **Azure App Service (Free F1)**    |
-| Frontend         | React (CRA) — hosted on **Azure Static Web Apps (Free)**         |
-| QR generation    | [`qrcode`](https://www.npmjs.com/package/qrcode)                 |
-| QR scanning      | [`html5-qrcode`](https://www.npmjs.com/package/html5-qrcode)     |
-| Secrets          | App Service **App Settings** (no Key Vault needed for MVP)       |
+| Layer | Choice |
+|---|---|
+| Database | Azure Table Storage — Standard LRS |
+| Email | Azure Communication Services |
+| Backend | Node.js + Express on Azure App Service (Free F1) |
+| Frontend | React on Azure Static Web Apps (Free) |
+| QR generation | `qrcode` npm package |
+| QR scanning | `html5-qrcode` — browser-based, no app install |
+| Secrets | App Service Application Settings |
 
-No Cosmos DB, no Service Bus, no Azure SQL, no paid tiers.
+No Cosmos DB. No Azure SQL. No paid tiers. Runs at near-zero cost for event-scale traffic.
 
 ---
 
@@ -55,28 +67,28 @@ No Cosmos DB, no Service Bus, no Azure SQL, no paid tiers.
 devpass/
   server.js
   routes/
-    auth.js            # admin login / logout
-    registrations.js   # public register + admin list/stats
-    actions.js         # admin approve / reject
-    checkin.js         # volunteer QR scan endpoint
+    auth.js              # admin login / logout
+    registrations.js     # public register + admin list + stats
+    actions.js           # approve / reject
+    checkin.js           # QR scan validation
   services/
-    tableStorage.js    # @azure/data-tables wrapper
-    emailService.js    # @azure/communication-email wrapper + templates
-    qrService.js       # QR generation
+    tableStorage.js      # Azure Table Storage wrapper
+    emailService.js      # ACS email + HTML templates
+    qrService.js         # QR code generation
   middleware/
-    requireAuth.js     # Bearer session check against AdminSessions table
+    requireAuth.js       # bearer session check
   utils/
-    validation.js      # shared server-side validation
+    validation.js        # shared input validation
   client/
     src/
       styles/
-        theme.css          # design tokens, globals, typography
-        components.css     # buttons, inputs, cards, pills, toasts, scan
+        theme.css         # design tokens and global resets
+        components.css    # buttons, inputs, cards, pills, toasts
       components/
         Navbar.jsx
         Toast.jsx
         StatusPill.jsx
-        Icons.jsx          # inline SVG icons (LinkedIn, GitHub, etc.)
+        Icons.jsx
       pages/
         Register.jsx
         Confirmed.jsx
@@ -91,37 +103,34 @@ devpass/
 
 ---
 
-## Local development
+## Local setup
 
-**Prerequisites:** Node 18+, an Azure subscription (for real storage + email).
+**Prerequisites:** Node 20+, an Azure subscription (storage + email are real Azure services — no local emulator needed for MVP).
 
 ```bash
-# 1. Install deps (root + client)
+# Install dependencies for backend and frontend
 npm run install:all
 
-# 2. Copy env and fill in values (at minimum: AZURE_STORAGE_CONNECTION_STRING,
-#    ACS_CONNECTION_STRING, ACS_SENDER_EMAIL, ADMIN_PASSWORD)
+# Copy the example env file and fill in your values
 cp .env.example .env
 
-# 3. Run the API (port 3001)
+# Start the API on port 3001
 npm run dev
 
-# 4. In a second terminal, run the React app (port 3000, proxies /api to :3001)
+# In a second terminal, start the React app on port 3000
 npm run client
 ```
 
-Open `http://localhost:3000/register`.
+Open [http://localhost:3000/register](http://localhost:3000/register).
 
 ---
 
 ## Environment variables
 
-See `.env.example`. Minimum set:
-
 ```env
-AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...
-ACS_CONNECTION_STRING=endpoint=https://<acs>.communication.azure.com/;accesskey=...
-ACS_SENDER_EMAIL=DoNotReply@devpass.azurecomm.net
+AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=...
+ACS_CONNECTION_STRING=endpoint=https://<name>.communication.azure.com/;accesskey=...
+ACS_SENDER_EMAIL=DoNotReply@<subdomain>.azurecomm.net
 ADMIN_PASSWORD=change-me
 SESSION_SECRET=some-long-random-string
 EVENT_ID=devpass-2025
@@ -132,70 +141,60 @@ PORT=3001
 CLIENT_ORIGIN=http://localhost:3000
 ```
 
+Minimum required to run: `AZURE_STORAGE_CONNECTION_STRING`, `ACS_CONNECTION_STRING`, `ACS_SENDER_EMAIL`, `ADMIN_PASSWORD`.
+
 ---
 
-## Data model — Azure Table Storage
+## Data model
 
 **Table: `Registrations`**
-- `PartitionKey` = `eventId` (e.g. `devpass-2025`)
-- `RowKey` = `uuid`
-- Fields: `name`, `email`, `phone`, `company`, `role`, `linkedinUrl`, `githubUrl`, `whyAttend`, `status` (`pending | approved | rejected`), `qrToken`, `checkedIn`, `registeredAt`, `decidedAt`
+
+| Field | Type | Notes |
+|---|---|---|
+| PartitionKey | string | `eventId` — e.g. `devpass-2025` |
+| RowKey | string | UUID generated on registration |
+| name, email, phone | string | Core contact info |
+| company, role | string | Role is a dropdown |
+| linkedinUrl, githubUrl | string | Optional social profiles |
+| whyAttend | string | Short answer from the form |
+| status | string | `pending` · `approved` · `rejected` |
+| qrToken | string | UUID issued only on approval |
+| checkedIn | boolean | Set to `true` on successful door scan |
+| registeredAt, decidedAt | ISO timestamp | Audit trail |
 
 **Table: `AdminSessions`**
-- `PartitionKey` = `"sessions"`
-- `RowKey` = `sessionToken`
-- Fields: `createdAt`, `expiresAt`
 
-Tables are **created automatically on first run** (`ensureTables()` in `services/tableStorage.js`).
+Stores bearer tokens issued on admin login. 8-hour TTL. Both tables are created automatically on first API boot — no manual setup needed.
 
 ---
 
-## API reference
+## API
 
-| Method | Path                          | Auth   | Purpose                                   |
-| ------ | ----------------------------- | ------ | ----------------------------------------- |
-| GET    | `/api/health`                 | none   | Health + event info                       |
-| GET    | `/api/event`                  | none   | Public event metadata                     |
-| POST   | `/api/register`               | none   | Attendee self-registration                |
-| POST   | `/api/admin/login`            | none   | Password → bearer session token           |
-| POST   | `/api/admin/logout`           | bearer | Invalidate current session                |
-| GET    | `/api/admin/registrations`    | bearer | List all registrations for the event      |
-| GET    | `/api/admin/stats`            | bearer | Counts by status + checked-in             |
-| POST   | `/api/admin/approve/:id`      | bearer | Approve → generate QR → send email        |
-| POST   | `/api/admin/reject/:id`       | bearer | Reject → send rejection email             |
-| POST   | `/api/checkin`                | none   | Volunteer QR scan (body = decoded JSON)   |
-
-All admin routes expect `Authorization: Bearer <token>`.
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| GET | `/api/health` | none | Health check + event info |
+| GET | `/api/event` | none | Public event metadata |
+| POST | `/api/register` | none | Attendee registration |
+| POST | `/api/admin/login` | none | Password → bearer token |
+| POST | `/api/admin/logout` | bearer | Invalidate session |
+| GET | `/api/admin/registrations` | bearer | List all attendees |
+| GET | `/api/admin/stats` | bearer | Counts by status |
+| POST | `/api/admin/approve/:id` | bearer | Approve → generate QR → send email |
+| POST | `/api/admin/reject/:id` | bearer | Reject → send email |
+| POST | `/api/checkin` | none | Validate QR and mark checked in |
 
 ---
 
-## Design system
+## Azure deployment
 
-All colours, radii and spacing are centralised in `client/src/styles/theme.css` as CSS custom properties. The two CSS files are the **single source of truth** — every page consumes them. Key tokens:
+Install the Azure CLI and run `az login` before starting.
 
-```css
---dp-lime:   #C8E649;  /* primary CTA, approved */
---dp-orange: #F97316;  /* pending, warnings */
---dp-bg:     #0F0F0F;  /* page background */
---dp-surface:#1A1A1A;  /* cards */
---dp-text:   #F5F5F5;
---dp-muted:  #888888;
---dp-danger: #f87171;
-```
-
----
-
-## Azure deployment (copy-paste)
-
-Assumes Azure CLI (`az`) is installed and you're logged in (`az login`).
-
-### 1. Resource group + storage
+### 1 — Resource group and storage
 
 ```bash
-# Pick unique, globally unique names (storage must be 3-24 lowercase alphanum)
 RG=devpass-rg
 LOC=eastus
-STORAGE=devpassstore$RANDOM
+STORAGE=devpassstore$RANDOM   # must be globally unique, lowercase alphanumeric
 
 az group create --name $RG --location $LOC
 
@@ -204,44 +203,30 @@ az storage account create \
   --resource-group $RG \
   --location $LOC \
   --sku Standard_LRS \
-  --kind StorageV2 \
-  --access-tier Hot
+  --kind StorageV2
 
-# Grab the connection string
-STORAGE_CONN=$(az storage account show-connection-string \
-  --name $STORAGE --resource-group $RG --query connectionString -o tsv)
-echo "AZURE_STORAGE_CONNECTION_STRING=$STORAGE_CONN"
+# Copy this — you'll need it as AZURE_STORAGE_CONNECTION_STRING
+az storage account show-connection-string \
+  --name $STORAGE --resource-group $RG --query connectionString -o tsv
 ```
 
-Tables (`Registrations`, `AdminSessions`) will be created automatically on first API boot.
-
-### 2. Azure Communication Services — Email
-
-Provisioning the ACS + Email resources and verifying a sender domain is a one-time UI task. Quick path using the default Azure-managed subdomain (no DNS setup required):
+### 2 — Azure Communication Services
 
 ```bash
-# Create ACS (Communication Services) resource
 az communication create \
   --name devpass-acs \
   --resource-group $RG \
   --location global \
   --data-location UnitedStates
-
-# Then in the Azure Portal:
-#   1. Open your ACS resource → Domains → "+ Connect domain"
-#   2. Create an "Azure-managed domain" (e.g. devpass.azurecomm.net) — instant, no DNS
-#   3. Note the sender address:  DoNotReply@<your-subdomain>.azurecomm.net
-#   4. Copy the ACS "Primary connection string" from Keys blade
-
-ACS_CONN="endpoint=https://<your-acs>.communication.azure.com/;accesskey=..."
-ACS_SENDER="DoNotReply@<your-subdomain>.azurecomm.net"
 ```
 
-### 3. Backend — App Service (Free F1)
+Then in the Azure Portal: open the ACS resource → **Email** → **Domains** → **Add a domain** → choose **Azure-managed domain**. This gives you a sender address instantly with no DNS setup. Copy the sender address and the Primary connection string from the **Keys** blade.
+
+### 3 — Backend on App Service
 
 ```bash
 PLAN=devpass-plan
-APP=devpass-api-$RANDOM  # must be globally unique
+APP=devpass-api-$RANDOM   # becomes your API URL subdomain
 
 az appservice plan create \
   --name $PLAN --resource-group $RG --sku F1 --is-linux
@@ -250,39 +235,39 @@ az webapp create \
   --name $APP \
   --resource-group $RG \
   --plan $PLAN \
-  --runtime "NODE:18-lts"
+  --runtime "NODE:20-lts"
 
-# Set App Settings (env vars)
+# Set all environment variables
 az webapp config appsettings set --resource-group $RG --name $APP --settings \
-  AZURE_STORAGE_CONNECTION_STRING="$STORAGE_CONN" \
-  ACS_CONNECTION_STRING="$ACS_CONN" \
-  ACS_SENDER_EMAIL="$ACS_SENDER" \
-  ADMIN_PASSWORD="change-me-please" \
+  AZURE_STORAGE_CONNECTION_STRING="<paste>" \
+  ACS_CONNECTION_STRING="<paste>" \
+  ACS_SENDER_EMAIL="<paste>" \
+  ADMIN_PASSWORD="<your-password>" \
   SESSION_SECRET="$(openssl rand -hex 32)" \
   EVENT_ID="devpass-2025" \
   EVENT_NAME="DevPass 2025" \
   EVENT_DATE="2025-08-15" \
-  EVENT_VENUE="Your Venue" \
-  WEBSITE_NODE_DEFAULT_VERSION="~18" \
+  EVENT_VENUE="<your venue>" \
+  NODE_ENV="production" \
   SCM_DO_BUILD_DURING_DEPLOYMENT="true"
 
 # Deploy via zip (from repo root)
-zip -r deploy.zip . -x "client/node_modules/*" "node_modules/*" ".git/*" "client/build/*"
+zip -r deploy.zip . \
+  -x "client/*" "node_modules/*" ".git/*" "*.env"
+
 az webapp deploy \
-  --resource-group $RG --name $APP --src-path deploy.zip --type zip
+  --resource-group $RG \
+  --name $APP \
+  --src-path deploy.zip \
+  --type zip
+
+# Smoke test
+curl https://$APP.azurewebsites.net/api/health
 ```
 
-### 4. Frontend — Static Web Apps (Free)
+### 4 — Frontend on Static Web Apps
 
-Easiest path is via GitHub: push the repo, then in the Portal:
-
-1. **Create a resource → Static Web App (Free plan)**
-2. Repository: your fork. Branch: `main`.
-3. **App location:** `client`
-4. **Output location:** `build`
-5. **API location:** leave empty (we use App Service)
-
-Or via CLI:
+Push your repo to GitHub first, then:
 
 ```bash
 az staticwebapp create \
@@ -295,9 +280,13 @@ az staticwebapp create \
   --login-with-github
 ```
 
-Set `REACT_APP_API_BASE` (in the SWA "Configuration" blade) to your App Service URL, e.g. `https://devpass-api-12345.azurewebsites.net`.
+Once deployed, get the URL and set the API base in the SWA Configuration blade:
 
-### 5. CORS on App Service
+```
+REACT_APP_API_BASE = https://<your-app>.azurewebsites.net
+```
+
+### 5 — Lock down CORS
 
 ```bash
 SWA_URL=https://<your-swa>.azurestaticapps.net
@@ -306,29 +295,54 @@ az webapp cors add \
   --resource-group $RG --name $APP \
   --allowed-origins $SWA_URL
 
-# Also set CLIENT_ORIGIN so Express CORS matches
 az webapp config appsettings set --resource-group $RG --name $APP --settings \
   CLIENT_ORIGIN="$SWA_URL"
 ```
 
-Done. Smoke-test:
+---
 
-```bash
-curl https://$APP.azurewebsites.net/api/health
+## Go-live checklist
+
+- [ ] `GET /api/health` returns `{ status: "ok" }`
+- [ ] Registration form submits and saves to Table Storage
+- [ ] Admin login works at `/admin`
+- [ ] Approving an attendee sends a QR pass email
+- [ ] Rejecting an attendee sends a polite rejection email
+- [ ] QR scan page opens camera on mobile
+- [ ] Valid QR scan marks attendee as checked in
+- [ ] Scanning the same QR a second time returns "already checked in"
+- [ ] `.env` file is not in the GitHub repo
+
+---
+
+## Design system
+
+The UI uses a lime-orange dark theme across all pages. Tokens live in `client/src/styles/theme.css`.
+
+```css
+--dp-lime:    #C8E649;   /* primary CTA, approved states */
+--dp-orange:  #F97316;   /* pending, warnings */
+--dp-bg:      #0F0F0F;   /* page background */
+--dp-surface: #1A1A1A;   /* cards and panels */
+--dp-text:    #F5F5F5;   /* primary text */
+--dp-muted:   #888888;   /* secondary text */
+--dp-danger:  #f87171;   /* rejected, errors */
 ```
 
 ---
 
-## Notes & trade-offs
+## Notes
 
-- **Sessions** are plain random tokens stored in the `AdminSessions` table with an 8-hour TTL. Good enough for an MVP; swap for JWT or an identity provider if you outgrow it.
-- The approval flow writes to storage **before** attempting to send the email. If email fails, you get a `502` back and can safely retry approval from the dashboard.
-- `/api/checkin` is intentionally unauthenticated — volunteers shouldn't have to log in on the door. The QR contains a UUID `qrToken` that's only issued on approval, so an attacker would have to guess a valid one to forge entry.
-- Free F1 App Service cold-starts; consider B1 ($) if you need snappy check-in at the door.
-- Table Storage queries filter by `PartitionKey = eventId`, which keeps reads cheap even at thousands of registrations.
+**Sessions** are plain UUIDs stored in Table Storage with an 8-hour TTL. Fine for MVP — swap for JWT or an identity provider when you outgrow it.
+
+**Email reliability** — the approval flow writes to storage before attempting to send email. If email fails you get a `502` and can safely retry from the dashboard without creating a duplicate record.
+
+**Check-in auth** — `/api/checkin` is intentionally unauthenticated. Volunteers shouldn't need to log in at the door. The QR encodes a UUID `qrToken` that is only generated on approval, so forging a valid one is not feasible.
+
+**Cold starts** — Free F1 App Service sleeps after inactivity. If snappy door check-in matters, upgrade to B1 (~$13/month).
 
 ---
 
 ## License
 
-MIT.
+MIT
