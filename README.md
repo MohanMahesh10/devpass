@@ -9,6 +9,28 @@ A lean, production-ready MVP for running developer events on Azure's lowest-cost
 - Approved attendees receive an email with a QR DevPass
 - Volunteers scan QR codes at the door at `/scan`
 
+
+<img width="1171" height="812" alt="Screenshot 2026-04-20 162936" src="https://github.com/user-attachments/assets/f7deb269-1b92-4ec1-be8d-8a263d634d21" />
+
+<img width="1141" height="766" alt="Screenshot 2026-04-20 163000" src="https://github.com/user-attachments/assets/00201884-ddba-43b2-ae45-7281e95a299e" />
+
+<img width="1482" height="691" alt="Screenshot 2026-04-20 163032" src="https://github.com/user-attachments/assets/c4c21625-da0b-41f7-8392-a8cbb0fca924" />
+
+<img width="1150" height="757" alt="Screenshot 2026-04-20 163110" src="https://github.com/user-attachments/assets/e23d1250-1fb2-4198-b798-7a81efee2357" />
+
+<img width="1582" height="735" alt="Screenshot 2026-04-20 163146" src="https://github.com/user-attachments/assets/1cd5c547-ba29-46a6-bd8d-fc363c8c6e09" />
+
+<img width="590" height="1280" alt="WhatsApp Image 2026-04-20 at 16 33 20" src="https://github.com/user-attachments/assets/3dd83f1c-b29c-4e52-99c1-1094a82c993d" />
+
+<img width="590" height="1280" alt="WhatsApp Image 2026-04-20 at 16 33 24" src="https://github.com/user-attachments/assets/0096505d-91a0-4a61-9893-8fdb0fba4ccd" />
+
+
+
+
+
+
+
+
 ---
 
 ## Stack
