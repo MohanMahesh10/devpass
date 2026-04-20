@@ -345,4 +345,4 @@ The UI uses a lime-orange dark theme across all pages. Tokens live in `client/sr
 
 ## License
 
-MIT
+Apache 2.0
