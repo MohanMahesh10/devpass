@@ -1,0 +1,44 @@
+# Deploys the DevPass backend (Express API) to Azure App Service.
+# Auth: Publish Profile (stored as AZUREAPPSERVICE_PUBLISHPROFILE secret).
+# Docs: https://github.com/Azure/webapps-deploy
+
+name: Build and deploy Node.js app to Azure Web App - devpass
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20.x'
+  AZURE_WEBAPP_NAME: devpass
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install backend dependencies (production only)
+        run: npm ci --omit=dev
+
+      - name: Stage backend files for deployment
+        run: |
+          mkdir -p deploy
+          cp -r server.js package.json package-lock.json routes services middleware utils node_modules deploy/
+          ls -la deploy
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: Production
+          package: ./deploy
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
