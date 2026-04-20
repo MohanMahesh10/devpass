@@ -1,0 +1,28 @@
+{
+  "name": "devpass",
+  "version": "1.0.0",
+  "description": "DevPass — Register. Get Approved. Show Your Pass.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "client": "npm --prefix client start",
+    "build": "npm --prefix client install && npm --prefix client run build",
+    "install:all": "npm install && npm --prefix client install"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@azure/communication-email": "^1.0.0",
+    "@azure/data-tables": "^13.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "qrcode": "^1.5.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

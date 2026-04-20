@@ -1,0 +1,116 @@
+:root {
+  --dp-lime: #C8E649;
+  --dp-lime-dark: #a8c430;
+  --dp-orange: #F97316;
+  --dp-orange-dark: #ea6504;
+  --dp-bg: #0F0F0F;
+  --dp-surface: #1A1A1A;
+  --dp-surface-2: #242424;
+  --dp-border: rgba(255, 255, 255, 0.08);
+  --dp-border-lime: rgba(200, 230, 73, 0.3);
+  --dp-border-orange: rgba(249, 115, 22, 0.3);
+  --dp-text: #F5F5F5;
+  --dp-muted: #888888;
+  --dp-danger: #f87171;
+
+  --dp-radius-card: 14px;
+  --dp-radius-input: 8px;
+  --dp-radius-btn: 9px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--dp-bg);
+  color: var(--dp-text);
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--dp-lime);
+  text-decoration: none;
+}
+a:hover { color: var(--dp-lime-dark); }
+
+h1, h2, h3, h4 {
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--dp-text);
+}
+
+h1 { font-size: 28px; }
+h2 { font-size: 22px; }
+h3 { font-size: 18px; }
+h4 { font-size: 15px; }
+
+p { color: var(--dp-text); }
+
+::selection {
+  background: rgba(200, 230, 73, 0.3);
+  color: var(--dp-text);
+}
+
+/* Scrollbar (webkit only — graceful fallback elsewhere) */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--dp-bg); }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #333; }
+
+/* Layout helpers */
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+}
+
+.page-narrow {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+}
+
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.row { display: flex; align-items: center; gap: 12px; }
+.row-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.spacer { flex: 1; }
+
+.muted {
+  color: var(--dp-muted);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+
+.section-title {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--dp-lime);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 640px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .page { padding: 20px 16px 60px; }
+  .page-narrow { padding: 20px 16px 60px; }
+  h1 { font-size: 24px; }
+  h2 { font-size: 20px; }
+}
