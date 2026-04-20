@@ -2,7 +2,7 @@
 
 **Register. Get Approved. Show Your Pass.**
 
-DevPass is a lean event registration system built for developer communities. Attendees apply online, an admin curates the list, and approved attendees receive a QR pass by email. Volunteers scan QR codes at the door — no app required.
+DevPass is a lean event registration system built for developer communities. Attendees apply online, an admin(agent) curates the list, and approved attendees receive a QR pass by email. Volunteers scan QR codes at the door — no app required.
 
 ---
 
