@@ -114,6 +114,18 @@ async function sendApprovalEmail({ to, name, eventName, eventDate, eventVenue, q
   return sendEmail({ to, subject, html, attachments });
 }
 
+async function sendPendingEmail({ to, name, eventName }) {
+  const subject = `We got your registration — ${eventName}`;
+  const inner = `
+    <h2 style="font-size:22px;font-weight:500;letter-spacing:-0.02em;margin:0 0 10px;">Hi ${escapeHtml(name)},</h2>
+    <p style="font-size:14px;line-height:1.6;color:#333;margin:0 0 12px;">Thanks for registering for <strong>${escapeHtml(eventName)}</strong>. Your application is in.</p>
+    <p style="font-size:14px;line-height:1.6;color:#333;margin:0 0 12px;">Our team is reviewing it now. Once approved, you'll get a follow-up email with your entry QR — so keep an eye on your inbox.</p>
+    <p style="font-size:14px;line-height:1.6;color:#333;margin:18px 0 0;">Appreciate the interest —<br/><span style="color:#111;font-weight:500;">The DevPass Team</span></p>
+  `;
+  const html = emailShell(eventName, inner);
+  return sendEmail({ to, subject, html });
+}
+
 async function sendRejectionEmail({ to, name, eventName }) {
   const subject = `Your DevPass registration for ${eventName}`;
   const inner = `
@@ -127,4 +139,4 @@ async function sendRejectionEmail({ to, name, eventName }) {
   return sendEmail({ to, subject, html });
 }
 
-module.exports = { sendApprovalEmail, sendRejectionEmail };
+module.exports = { sendPendingEmail, sendApprovalEmail, sendRejectionEmail };

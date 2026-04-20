@@ -3,11 +3,13 @@ const { v4: uuidv4 } = require('uuid');
 
 const { validateRegistration } = require('../utils/validation');
 const { createRegistration, listRegistrations } = require('../services/tableStorage');
+const { sendPendingEmail } = require('../services/emailService');
 const requireAuth = require('../middleware/requireAuth');
 
 const router = express.Router();
 
 const EVENT_ID = process.env.EVENT_ID || 'devpass-2025';
+const EVENT_NAME = process.env.EVENT_NAME || 'DevPass 2025';
 
 // POST /api/register — public
 router.post('/register', async (req, res) => {
@@ -35,6 +37,15 @@ router.post('/register', async (req, res) => {
     };
 
     await createRegistration(entity);
+
+    sendPendingEmail({
+      to: entity.email,
+      name: entity.name,
+      eventName: EVENT_NAME
+    }).catch((mailErr) => {
+      console.error('[register] pending email send failed', mailErr);
+    });
+
     res.status(201).json({ ok: true, id: entity.rowKey });
   } catch (err) {
     console.error('[POST /register] error', err);
