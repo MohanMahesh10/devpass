@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const { validateRegistration } = require('../utils/validation');
 const { createRegistration, listRegistrations } = require('../services/tableStorage');
 const { sendPendingEmail } = require('../services/emailService');
+const { triggerScreening } = require('../services/aiScreeningService');
 const requireAuth = require('../middleware/requireAuth');
 
 const router = express.Router();
@@ -33,7 +34,17 @@ router.post('/register', async (req, res) => {
       qrToken: '',
       checkedIn: false,
       registeredAt: now,
-      decidedAt: ''
+      decidedAt: '',
+      // AI fields populated asynchronously by the agent
+      aiScore: 0,
+      profileGroup: '',
+      isShortlisted: false,
+      isDuplicate: false,
+      isSpam: false,
+      isBot: false,
+      agentDraftApprovalEmail: '',
+      agentDraftRejectionEmail: '',
+      aiScreenedAt: ''
     };
 
     await createRegistration(entity);
@@ -46,6 +57,9 @@ router.post('/register', async (req, res) => {
       console.error('[register] pending email send failed', mailErr);
     });
 
+    // Fire-and-forget agent screening — never blocks the response.
+    triggerScreening(EVENT_ID, entity.rowKey, { registration: entity });
+
     res.status(201).json({ ok: true, id: entity.rowKey });
   } catch (err) {
     console.error('[POST /register] error', err);
@@ -53,26 +67,40 @@ router.post('/register', async (req, res) => {
   }
 });
 
+function shapeRegistration(r) {
+  return {
+    id: r.rowKey,
+    name: r.name,
+    email: r.email,
+    phone: r.phone,
+    company: r.company,
+    role: r.role,
+    linkedinUrl: r.linkedinUrl,
+    githubUrl: r.githubUrl,
+    whyAttend: r.whyAttend,
+    status: r.status,
+    checkedIn: !!r.checkedIn,
+    registeredAt: r.registeredAt,
+    decidedAt: r.decidedAt,
+    decidedBy: r.decidedBy || '',
+    // AI fields
+    aiScore: Number(r.aiScore) || 0,
+    profileGroup: r.profileGroup || '',
+    isShortlisted: !!r.isShortlisted,
+    isDuplicate: !!r.isDuplicate,
+    isSpam: !!r.isSpam,
+    isBot: !!r.isBot,
+    agentDraftApprovalEmail: r.agentDraftApprovalEmail || '',
+    agentDraftRejectionEmail: r.agentDraftRejectionEmail || '',
+    aiScreenedAt: r.aiScreenedAt || ''
+  };
+}
+
 // GET /api/admin/registrations — auth
 router.get('/admin/registrations', requireAuth, async (req, res) => {
   try {
     const items = await listRegistrations(EVENT_ID);
-    const payload = items.map((r) => ({
-      id: r.rowKey,
-      name: r.name,
-      email: r.email,
-      phone: r.phone,
-      company: r.company,
-      role: r.role,
-      linkedinUrl: r.linkedinUrl,
-      githubUrl: r.githubUrl,
-      whyAttend: r.whyAttend,
-      status: r.status,
-      checkedIn: !!r.checkedIn,
-      registeredAt: r.registeredAt,
-      decidedAt: r.decidedAt
-    }));
-    res.json({ registrations: payload });
+    res.json({ registrations: items.map(shapeRegistration) });
   } catch (err) {
     console.error('[GET /admin/registrations] error', err);
     res.status(500).json({ error: 'Failed to load registrations' });
@@ -83,12 +111,22 @@ router.get('/admin/registrations', requireAuth, async (req, res) => {
 router.get('/admin/stats', requireAuth, async (req, res) => {
   try {
     const items = await listRegistrations(EVENT_ID);
-    const stats = { pending: 0, approved: 0, rejected: 0, checkedIn: 0, total: items.length };
+    const stats = {
+      pending: 0, approved: 0, rejected: 0, checkedIn: 0,
+      shortlisted: 0, autoApproved: 0, flagged: 0,
+      total: items.length,
+      profileBreakdown: {}
+    };
     for (const r of items) {
       if (r.status === 'pending') stats.pending++;
       else if (r.status === 'approved') stats.approved++;
       else if (r.status === 'rejected') stats.rejected++;
       if (r.checkedIn) stats.checkedIn++;
+      if (r.isShortlisted) stats.shortlisted++;
+      if (r.decidedBy === 'ai_agent') stats.autoApproved++;
+      if (r.isDuplicate || r.isSpam || r.isBot) stats.flagged++;
+      const group = r.profileGroup || '';
+      if (group) stats.profileBreakdown[group] = (stats.profileBreakdown[group] || 0) + 1;
     }
     res.json(stats);
   } catch (err) {
@@ -98,3 +136,4 @@ router.get('/admin/stats', requireAuth, async (req, res) => {
 });
 
 module.exports = router;
+module.exports.shapeRegistration = shapeRegistration;

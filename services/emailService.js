@@ -139,4 +139,60 @@ async function sendRejectionEmail({ to, name, eventName }) {
   return sendEmail({ to, subject, html });
 }
 
-module.exports = { sendPendingEmail, sendApprovalEmail, sendRejectionEmail };
+/**
+ * Render a plaintext body (e.g. organizer-edited or AI-drafted) into the
+ * standard DevPass email shell. Preserves paragraph breaks.
+ */
+function bodyToHtml(bodyText = '') {
+  return String(bodyText)
+    .split(/\n\s*\n/)
+    .map((para) =>
+      `<p style="font-size:14px;line-height:1.6;color:#333;margin:0 0 12px;">${escapeHtml(para).replace(/\n/g, '<br/>')}</p>`
+    )
+    .join('\n');
+}
+
+async function sendCustomApprovalEmail({ to, name, eventName, eventDate, eventVenue, qrBase64, bodyText }) {
+  const subject = `Your DevPass is ready — ${eventName}`;
+  const inner = `
+    ${bodyToHtml(bodyText)}
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:14px 0 18px;">
+      <tr>
+        <td style="font-size:11px;color:${MUTED};letter-spacing:0.06em;text-transform:uppercase;padding:2px 14px 2px 0;">Date</td>
+        <td style="font-size:13px;color:#111;padding:2px 0;">${escapeHtml(eventDate)}</td>
+      </tr>
+      <tr>
+        <td style="font-size:11px;color:${MUTED};letter-spacing:0.06em;text-transform:uppercase;padding:2px 14px 2px 0;">Venue</td>
+        <td style="font-size:13px;color:#111;padding:2px 0;">${escapeHtml(eventVenue)}</td>
+      </tr>
+    </table>
+    <div style="text-align:center;background:#0F0F0F;border-radius:14px;padding:20px;margin:18px 0;">
+      <img src="cid:devpass-qr" alt="Your DevPass QR" width="200" height="200" style="display:block;margin:0 auto;background:#fff;border-radius:12px;padding:10px;" />
+      <div style="color:${LIME};font-size:11px;letter-spacing:0.06em;text-transform:uppercase;margin-top:12px;font-weight:500;">Your DevPass</div>
+    </div>
+    <p style="font-size:13px;line-height:1.6;color:${MUTED};margin:0;">Show this QR at the entrance.</p>
+  `;
+  const html = emailShell(eventName, inner);
+  const attachments = [{
+    name: 'devpass-qr.png',
+    contentType: 'image/png',
+    contentInBase64: qrBase64,
+    contentId: 'devpass-qr'
+  }];
+  return sendEmail({ to, subject, html, attachments });
+}
+
+async function sendCustomRejectionEmail({ to, name, eventName, bodyText }) {
+  const subject = `Your DevPass registration for ${eventName}`;
+  const inner = bodyToHtml(bodyText);
+  const html = emailShell(eventName, inner);
+  return sendEmail({ to, subject, html });
+}
+
+module.exports = {
+  sendPendingEmail,
+  sendApprovalEmail,
+  sendRejectionEmail,
+  sendCustomApprovalEmail,
+  sendCustomRejectionEmail
+};

@@ -37,3 +37,15 @@ export async function apiPost(path, body, token) {
   });
   return handle(res);
 }
+
+export async function apiPatch(path, body, token) {
+  const res = await fetch(url(path), {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify(body || {})
+  });
+  return handle(res);
+}

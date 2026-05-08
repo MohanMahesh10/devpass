@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth');
 const registrationRoutes = require('./routes/registrations');
 const actionRoutes = require('./routes/actions');
 const checkinRoutes = require('./routes/checkin');
+const agentRoutes = require('./routes/agentRoutes');
 const { ensureTables } = require('./services/tableStorage');
 
 const app = express();
@@ -53,6 +54,7 @@ app.use('/api', authRoutes);
 app.use('/api', registrationRoutes);
 app.use('/api', actionRoutes);
 app.use('/api', checkinRoutes);
+app.use('/api', agentRoutes);
 
 // ---- Static serve built React app in production ----
 const clientBuild = path.join(__dirname, 'client', 'build');
